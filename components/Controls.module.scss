@@ -1,0 +1,10 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  z-index: 1000;
+  overflow-y: scroll;
+  max-height: 95vh;
+  background-color: rgba(0, 0, 0, 0.3);
+}
