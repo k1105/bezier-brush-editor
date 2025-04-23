@@ -2,6 +2,7 @@ import styles from "./Controls.module.scss";
 import {useState} from "react";
 import LayerControl from "./LayerControl";
 import {Mode, AnimationType, Layer} from "@/types/types";
+import {Icon} from "@iconify/react/dist/iconify.js";
 
 interface ControlsProps {
   mode: Mode;
@@ -18,6 +19,7 @@ interface ControlsProps {
 }
 
 const Controls = ({
+  mode,
   setMode,
   isPlaying,
   setIsPlaying,
@@ -36,100 +38,134 @@ const Controls = ({
   };
 
   return (
-    <div
-      className={styles.container}
-      onClick={stopPropagation}
-      onMouseDown={stopPropagation}
-    >
-      <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+    <div className={styles.container}>
+      <div
+        onClick={stopPropagation}
+        onMouseDown={stopPropagation}
+        className={styles.modeSelectorContainer}
+      >
         <button
           onClick={(e) => {
             stopPropagation(e);
             setMode("bezier");
           }}
+          className={`${styles.modeSelectorButton} ${
+            mode === "bezier" ? styles.active : ""
+          }`}
         >
-          Bézier
+          <Icon
+            icon="ic:baseline-ads-click"
+            className={`${styles.modeSelectorIcon} ${
+              mode === "bezier" ? styles.active : ""
+            }`}
+          />
         </button>
         <button
           onClick={(e) => {
             stopPropagation(e);
             setMode("circle");
           }}
+          className={`${styles.modeSelectorButton} ${
+            mode === "circle" ? styles.active : ""
+          }`}
         >
-          Circle
+          <Icon icon="ic:outline-circle" className={styles.modeSelectorIcon} />
         </button>
         <button
           onClick={(e) => {
             stopPropagation(e);
             setMode("preview");
           }}
+          className={`${styles.modeSelectorButton} ${
+            mode === "preview" ? styles.active : ""
+          }`}
         >
-          Preview
+          <Icon
+            icon="ic:outline-remove-red-eye"
+            className={styles.modeSelectorIcon}
+          />
         </button>
         <button
           onClick={(e) => {
             stopPropagation(e);
             setMode("translate");
           }}
+          className={`${styles.modeSelectorButton} ${
+            mode === "translate" ? styles.active : ""
+          }`}
         >
-          Translate
-        </button>
-      </div>
-      <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-        <button
-          onClick={(e) => {
-            stopPropagation(e);
-            setIsPlaying(!isPlaying);
-          }}
-        >
-          {isPlaying ? "Stop" : "Play"}
-        </button>
-      </div>
-      <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-        <label>
-          Speed:
-          <input
-            type="range"
-            min="0.1"
-            max="5"
-            step="0.1"
-            value={animationSpeed}
-            onChange={(e) => setAnimationSpeed(parseFloat(e.target.value))}
-            onClick={stopPropagation}
-            onMouseDown={stopPropagation}
+          <Icon
+            icon="ic:sharp-compare-arrows"
+            className={styles.modeSelectorIcon}
           />
-          {animationSpeed.toFixed(1)}s
-        </label>
+        </button>
       </div>
-      <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-        <label>
-          Animation Type:
-          <select
-            value={animationType}
-            onChange={(e) => setAnimationType(e.target.value as AnimationType)}
-            onClick={stopPropagation}
-            onMouseDown={stopPropagation}
+      <div className={styles.motionControlContainer}>
+        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+          <button
+            onClick={(e) => {
+              stopPropagation(e);
+              setIsPlaying(!isPlaying);
+            }}
+            className={styles.motionControlButton}
           >
-            <option value="default">Default</option>
-            <option value="backAndForth">Back and Forth</option>
-          </select>
-        </label>
-      </div>
-      <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-        {layers.map((_, index) => {
-          const isExpanded = expandedLayers.has(index);
-          return (
-            <LayerControl
-              key={index}
-              keyIndex={index}
-              isExpanded={isExpanded}
-              expandedLayers={expandedLayers}
-              setExpandedLayers={setExpandedLayers}
-              isSelected={index === currentLayerIndex}
-              onSelect={() => setCurrentLayerIndex(index)}
+            {isPlaying ? "Stop" : "Play"}
+          </button>
+        </div>
+        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+          <label>
+            Speed:
+            <input
+              type="range"
+              min="0.1"
+              max="5"
+              step="0.1"
+              value={animationSpeed}
+              onChange={(e) => setAnimationSpeed(parseFloat(e.target.value))}
+              onClick={stopPropagation}
+              onMouseDown={stopPropagation}
             />
-          );
-        })}
+            {animationSpeed.toFixed(1)}s
+          </label>
+        </div>
+        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+          <label>
+            Animation Type:
+            <select
+              value={animationType}
+              onChange={(e) =>
+                setAnimationType(e.target.value as AnimationType)
+              }
+              onClick={stopPropagation}
+              onMouseDown={stopPropagation}
+            >
+              <option value="default">Default</option>
+              <option value="backAndForth">Back and Forth</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div
+        className={styles.layerContainer}
+        onClick={stopPropagation}
+        onMouseDown={stopPropagation}
+      >
+        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+          {layers.map((_, index) => {
+            const isExpanded = expandedLayers.has(index);
+            return (
+              <LayerControl
+                key={index}
+                keyIndex={index}
+                isExpanded={isExpanded}
+                expandedLayers={expandedLayers}
+                setExpandedLayers={setExpandedLayers}
+                isSelected={index === currentLayerIndex}
+                onSelect={() => setCurrentLayerIndex(index)}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import styles from "@/styles/Home.module.css";
-import Sketch from "@/components/Sketch";
+import Sketch from "@/components/sketch/Sketch";
 
 export default function Home() {
   return (

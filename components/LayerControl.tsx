@@ -39,16 +39,11 @@ const LayerControl = ({
       onClick={(e) => {
         stopPropagation(e);
         onSelect();
+        toggleLayer(keyIndex);
       }}
       onMouseDown={stopPropagation}
     >
-      <div
-        className={styles.header}
-        onClick={(e) => {
-          stopPropagation(e);
-          toggleLayer(keyIndex);
-        }}
-      >
+      <div className={styles.header}>
         <p>Layer {keyIndex}</p>
         <div className={styles.iconContainer}>
           <Icon
