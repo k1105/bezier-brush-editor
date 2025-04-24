@@ -20,6 +20,15 @@ export interface CanvasState {
   mode: Mode;
   currentLayerIndex: number;
   layers: Layer[];
+  selectedAnchor: {path: CubicPath; idx: number} | null;
+  hoveredAnchor: {path: CubicPath; idx: number} | null;
+  hit: {
+    path: CubicPath;
+    kind: "in" | "out" | "anchor";
+    idx: number;
+  } | null;
+  dragWhole: boolean;
+  lastMouse: Vec | null;
 }
 
 export interface MouseState {

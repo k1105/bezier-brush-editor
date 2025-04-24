@@ -7,6 +7,11 @@ export const useCanvas = (initialMode: Mode = "bezier") => {
     mode: initialMode,
     currentLayerIndex: 0,
     layers: [{path: new CubicPath(), isVisible: true, name: "Layer 0"}],
+    selectedAnchor: null,
+    hoveredAnchor: null,
+    hit: null,
+    dragWhole: false,
+    lastMouse: null,
   });
 
   const currentPathRef = useRef<CubicPath>(canvasState.layers[0].path);
@@ -15,7 +20,16 @@ export const useCanvas = (initialMode: Mode = "bezier") => {
   );
 
   const updateCanvasState = useCallback((updates: Partial<CanvasState>) => {
-    setCanvasState((prev) => ({...prev, ...updates}));
+    setCanvasState((prev) => {
+      const newState = {...prev, ...updates};
+      // レイヤーが更新された場合、currentPathRefも更新
+      if (updates.layers || updates.currentLayerIndex !== undefined) {
+        currentPathRef.current =
+          newState.layers[newState.currentLayerIndex].path;
+        setCurrentPath(currentPathRef.current);
+      }
+      return newState;
+    });
   }, []);
 
   const addLayer = useCallback(() => {
@@ -30,6 +44,11 @@ export const useCanvas = (initialMode: Mode = "bezier") => {
       ...prev,
       layers: [...prev.layers, newLayer],
       currentLayerIndex: prev.layers.length,
+      selectedAnchor: null,
+      hoveredAnchor: null,
+      hit: null,
+      dragWhole: false,
+      lastMouse: null,
     }));
 
     currentPathRef.current = newPath;
@@ -42,6 +61,11 @@ export const useCanvas = (initialMode: Mode = "bezier") => {
         setCanvasState((prev) => ({
           ...prev,
           currentLayerIndex: index,
+          selectedAnchor: null,
+          hoveredAnchor: null,
+          hit: null,
+          dragWhole: false,
+          lastMouse: null,
         }));
         currentPathRef.current = canvasState.layers[index].path;
         setCurrentPath(canvasState.layers[index].path);

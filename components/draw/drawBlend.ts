@@ -17,12 +17,24 @@ export function drawBlend(
     ? Math.min(Math.floor((currentCircleIndex / totalFrames) * 1000), 1000)
     : 1000;
 
-  animationStrategy.draw(
-    p,
-    path,
-    circles,
-    currentCircleIndex,
-    totalFrames,
-    pointsToShow
-  );
+  // アニメーションが停止している場合は、すべての点を表示
+  if (!isSketchPlaying) {
+    animationStrategy.draw(
+      p,
+      path,
+      circles,
+      totalFrames - 1, // 最後のフレームを表示
+      totalFrames,
+      pointsToShow
+    );
+  } else {
+    animationStrategy.draw(
+      p,
+      path,
+      circles,
+      currentCircleIndex,
+      totalFrames,
+      pointsToShow
+    );
+  }
 }

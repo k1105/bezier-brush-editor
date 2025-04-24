@@ -103,6 +103,21 @@ export class Circle {
   contains(pt: Vec): boolean {
     return Vec.dist(this.pos(), pt) <= this.r;
   }
+
+  getControlPoint(): Vec {
+    return new Vec(this.pos().x + this.r - 10, this.pos().y);
+  }
+
+  containsControlPoint(pt: Vec): boolean {
+    const controlPoint = this.getControlPoint();
+    return Vec.dist(controlPoint, pt) < 5;
+  }
+
+  updateRadiusFromControlPoint(pt: Vec): void {
+    const dx = pt.x - this.pos().x;
+    const newRadius = Math.max(10, Math.min(100, dx + 10));
+    this.r = newRadius;
+  }
 }
 
 // Utility function
