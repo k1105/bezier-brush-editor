@@ -4,7 +4,6 @@ import {useState} from "react";
 interface LayerControlProps {
   keyIndex: number;
   isExpanded: boolean;
-  expandedLayers: Set<number>;
   setExpandedLayers: (expandedLayers: Set<number>) => void;
   isSelected: boolean;
   onSelect: () => void;
@@ -15,7 +14,6 @@ interface LayerControlProps {
 const LayerControl = ({
   keyIndex,
   isExpanded,
-  expandedLayers,
   setExpandedLayers,
   isSelected,
   onSelect,
@@ -24,16 +22,6 @@ const LayerControl = ({
 }: LayerControlProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(layerName);
-
-  const toggleLayer = (index: number) => {
-    const newExpandedLayers = new Set<number>(expandedLayers);
-    if (newExpandedLayers.has(index)) {
-      newExpandedLayers.delete(index);
-    } else {
-      newExpandedLayers.add(index);
-    }
-    setExpandedLayers(newExpandedLayers);
-  };
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,7 +56,11 @@ const LayerControl = ({
       onClick={(e) => {
         stopPropagation(e);
         onSelect();
-        toggleLayer(keyIndex);
+        const newExpandedLayers = new Set<number>();
+        if (isSelected) {
+          newExpandedLayers.add(keyIndex);
+        }
+        setExpandedLayers(newExpandedLayers);
       }}
       onMouseDown={stopPropagation}
     >

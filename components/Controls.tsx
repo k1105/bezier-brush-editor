@@ -128,76 +128,80 @@ const Controls = ({
           />
         </button>
       </div>
-      <div className={styles.motionControlContainer}>
-        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-          <button
-            onClick={(e) => {
-              stopPropagation(e);
-              setIsPlaying(!isPlaying);
-            }}
-            className={styles.motionControlButton}
-          >
-            {isPlaying ? "Stop" : "Play"}
-          </button>
-        </div>
-        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-          <label>
-            Speed:
-            <input
-              type="range"
-              min="0.1"
-              max="5"
-              step="0.1"
-              value={animationSpeed}
-              onChange={(e) => setAnimationSpeed(parseFloat(e.target.value))}
-              onClick={stopPropagation}
-              onMouseDown={stopPropagation}
-            />
-            {animationSpeed.toFixed(1)}s
-          </label>
-        </div>
-        <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-          <label>
-            Animation Type:
-            <select
-              value={animationType}
-              onChange={(e) =>
-                setAnimationType(e.target.value as AnimationType)
-              }
-              onClick={stopPropagation}
-              onMouseDown={stopPropagation}
-            >
-              <option value="default">Default</option>
-              <option value="backAndForth">Back and Forth</option>
-            </select>
-          </label>
-        </div>
-      </div>
       <div
         className={styles.layerContainer}
         onClick={stopPropagation}
         onMouseDown={stopPropagation}
       >
         <div className={styles.layerActions}>
-          <button
-            className={styles.layerActionButton}
-            onClick={() => {
-              console.log("delete layer");
-              removeLayer(currentLayerIndex);
-            }}
-            disabled={layers.length <= 1}
-          >
-            <Icon icon="ic:baseline-delete" className={styles.icon} />
-          </button>
-          <button
-            className={styles.layerActionButton}
-            onClick={() => console.log("copy layer")}
-          >
-            <Icon
-              icon="ic:baseline-control-point-duplicate"
-              className={styles.icon}
-            />
-          </button>
+          <div className={styles.layerActionButtonContainer}>
+            <button
+              className={styles.layerActionButton}
+              onClick={() => {
+                console.log("delete layer");
+                removeLayer(currentLayerIndex);
+              }}
+              disabled={layers.length <= 1}
+            >
+              <Icon icon="ic:baseline-delete" className={styles.icon} />
+            </button>
+            <button
+              className={styles.layerActionButton}
+              onClick={() => console.log("copy layer")}
+            >
+              <Icon
+                icon="ic:baseline-control-point-duplicate"
+                className={styles.icon}
+              />
+            </button>
+          </div>
+          <div className={styles.motionControlContainer}>
+            <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+              <button
+                onClick={(e) => {
+                  stopPropagation(e);
+                  setIsPlaying(!isPlaying);
+                }}
+                className={styles.motionControlButton}
+              >
+                {isPlaying ? "Stop" : "Play"}
+              </button>
+            </div>
+            <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+              <label>
+                Speed:
+                <input
+                  type="range"
+                  min="0.1"
+                  max="5"
+                  step="0.1"
+                  value={animationSpeed}
+                  onChange={(e) =>
+                    setAnimationSpeed(parseFloat(e.target.value))
+                  }
+                  onClick={stopPropagation}
+                  onMouseDown={stopPropagation}
+                />
+                {animationSpeed.toFixed(1)}s
+              </label>
+            </div>
+            <div onClick={stopPropagation} onMouseDown={stopPropagation}>
+              <label>
+                Animation Type:
+                <select
+                  value={animationType}
+                  onChange={(e) =>
+                    setAnimationType(e.target.value as AnimationType)
+                  }
+                  onClick={stopPropagation}
+                  onMouseDown={stopPropagation}
+                >
+                  <option value="default">Default</option>
+                  <option value="backAndForth">Back and Forth</option>
+                </select>
+              </label>
+            </div>
+          </div>
         </div>
         <div onClick={stopPropagation} onMouseDown={stopPropagation}>
           {layers.map((layer, index) => {
@@ -207,7 +211,6 @@ const Controls = ({
                 key={index}
                 keyIndex={index}
                 isExpanded={isExpanded}
-                expandedLayers={expandedLayers}
                 setExpandedLayers={setExpandedLayers}
                 isSelected={index === currentLayerIndex}
                 onSelect={() => setCurrentLayerIndex(index)}
