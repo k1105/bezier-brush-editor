@@ -7,7 +7,7 @@ export function drawAnchor(
   state: "inactive" | "selected" | "hover"
 ) {
   p.noFill();
-  p.stroke(0);
+  p.stroke(255);
   p.strokeWeight(1);
 
   if (state === "inactive") {

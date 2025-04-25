@@ -1,5 +1,5 @@
 import styles from "./Controls.module.scss";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import LayerControl from "./LayerControl";
 import {Mode, AnimationType, Layer, CanvasState} from "@/types/types";
 import {Icon} from "@iconify/react/dist/iconify.js";
@@ -35,6 +35,20 @@ const Controls = ({
   updateCanvasState,
 }: ControlsProps) => {
   const [expandedLayers, setExpandedLayers] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        setIsPlaying(!isPlaying);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isPlaying, setIsPlaying]);
 
   const {removeLayer, renameLayer} = useLayers(
     layers,

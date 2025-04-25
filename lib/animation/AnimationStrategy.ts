@@ -54,7 +54,7 @@ export class DefaultAnimationStrategy implements AnimationStrategy {
     if (L === 0) return;
 
     p.noStroke();
-    p.fill(0);
+    p.fill(255);
 
     for (let k = 0; k < pointsToShow; k++) {
       const target = (L * k) / (this.K_BLEND - 1);
@@ -141,7 +141,7 @@ export class BackAndForthAnimationStrategy implements AnimationStrategy {
     if (L === 0) return;
 
     p.noStroke();
-    p.fill(0);
+    p.fill(255);
 
     // 往復アニメーションの実装
     const isForward = currentFrame < totalFrames;

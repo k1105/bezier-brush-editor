@@ -175,7 +175,7 @@ const Sketch = () => {
       };
 
       p.draw = () => {
-        p.background(255);
+        p.background(0);
 
         // レイヤーに基づいてパスを描画
         layers.forEach((layer, index) => {
