@@ -12,7 +12,7 @@ import {
 import {useCanvas} from "@/hooks/useCanvas";
 import {useAnimation} from "@/hooks/useAnimation";
 import {useLayers} from "@/hooks/useLayers";
-import {CircleState} from "@/types/types";
+import {CircleState, Layer} from "@/types/types";
 import {drawPath} from "@/components/draw/drawPath";
 import {drawCircle} from "@/components/draw/drawCircle";
 
@@ -55,7 +55,8 @@ const Sketch = () => {
       // 状態
       const paths: CubicPath[] = [];
       let current = currentPathRef.current;
-      const circles = circleState.circles;
+      // const circles = circleState.circles;
+      let circles: Circle[] = [];
       let hit: {
         path: CubicPath;
         kind: "in" | "out" | "anchor";
@@ -63,21 +64,24 @@ const Sketch = () => {
       } | null = null;
       let selectedCircle = -1;
       let p5Mode = "bezier";
+      let layers: Layer[] = [];
       let selectedAnchor: {path: CubicPath; idx: number} | null = null;
       let hoveredAnchor: {path: CubicPath; idx: number} | null = null;
       let currentCircleIndex = 0;
+      let currentLayerIndex = 0;
       let isSketchPlaying = false;
       let sketchAnimationSpeed = 1;
       let p5AnimationType = "default";
       let animationStrategy: AnimationStrategy = new DefaultAnimationStrategy();
       let isDraggingControlPoint = false;
+      let previousLayerIndex = 0;
 
       // マウス操作
       function isWithinCanvas(x: number, y: number): boolean {
         return x >= 0 && x <= p.width && y >= 0 && y <= p.height;
       }
 
-      function pressBezier() {
+      function pressBezier(currentLayerPath: CubicPath) {
         // プレビューモードの場合は何もしない
         if (p5Mode === "preview") {
           return;
@@ -89,10 +93,6 @@ const Sketch = () => {
         if (!isWithinCanvas(pt.x, pt.y)) {
           return;
         }
-
-        // 現在選択中のレイヤーのパスを取得
-        const currentLayerPath =
-          canvasState.layers[canvasState.currentLayerIndex].path;
 
         // アンカーポイントの選択
         for (let i = 0; i < currentLayerPath.anchors.length; i++) {
@@ -132,11 +132,14 @@ const Sketch = () => {
 
       p.updateWithProps = (props) => {
         p5Mode = props.mode as string;
+        layers = props.layers as Layer[];
         isSketchPlaying = props.isPlaying as boolean;
         sketchAnimationSpeed = props.animationSpeed as number;
         currentCircleIndex = props.currentCircleIndex as number;
+        currentLayerIndex = props.currentLayerIndex as number;
         p5AnimationType = props.animationType as string;
         animationStrategy = props.animationStrategy as AnimationStrategy;
+        circles = props.circles as Circle[];
         selectedAnchor = props.selectedAnchor as {
           path: CubicPath;
           idx: number;
@@ -152,18 +155,18 @@ const Sketch = () => {
         } | null;
 
         // レイヤーが切り替わった時にcurrentを更新
-        const newLayerIndex = props.currentLayerIndex as number;
-        if (newLayerIndex !== canvasState.currentLayerIndex) {
-          if (canvasState.layers[newLayerIndex]) {
-            current = canvasState.layers[newLayerIndex].path;
+        if (currentLayerIndex !== previousLayerIndex) {
+          if (layers[currentLayerIndex]) {
+            current = layers[currentLayerIndex].path;
             currentPathRef.current = current;
-            switchLayer(newLayerIndex);
+            switchLayer(currentLayerIndex);
           } else {
             // 新規レイヤーの場合は新しいパスを作成
             current = new CubicPath();
             currentPathRef.current = current;
-            switchLayer(newLayerIndex);
+            switchLayer(currentLayerIndex);
           }
+          previousLayerIndex = currentLayerIndex;
         }
       };
 
@@ -175,7 +178,7 @@ const Sketch = () => {
         p.background(255);
 
         // レイヤーに基づいてパスを描画
-        canvasState.layers.forEach((layer) => {
+        layers.forEach((layer, index) => {
           if (layer.isVisible) {
             drawPath(
               p,
@@ -189,7 +192,8 @@ const Sketch = () => {
               isSketchPlaying,
               currentCircleIndex,
               circles,
-              animationStrategy
+              animationStrategy,
+              index === currentLayerIndex
             );
           }
         });
@@ -208,7 +212,8 @@ const Sketch = () => {
             isSketchPlaying,
             currentCircleIndex,
             circles,
-            animationStrategy
+            animationStrategy,
+            true
           );
 
           // 赤い円は常に表示
@@ -269,7 +274,7 @@ const Sketch = () => {
         } else if (p5Mode === "translate") {
           // TODO: translate mode implementation
         } else {
-          pressBezier();
+          pressBezier(current);
         }
       };
 
@@ -295,8 +300,7 @@ const Sketch = () => {
           const newY = Math.max(0, Math.min(p.height, p.mouseY));
 
           // 現在選択中のレイヤーのパスを取得
-          const currentLayerPath =
-            canvasState.layers[canvasState.currentLayerIndex].path;
+          const currentLayerPath = layers[canvasState.currentLayerIndex].path;
 
           if (hit.kind === "anchor") {
             const movedX = newX - p.pmouseX;
@@ -398,7 +402,7 @@ const Sketch = () => {
         }
       };
     },
-    [currentPath, circleState]
+    [currentPath]
   );
 
   return (
@@ -421,6 +425,7 @@ const Sketch = () => {
         setCurrentLayerIndex={(currentLayerIndex) =>
           updateCanvasState({currentLayerIndex})
         }
+        updateCanvasState={updateCanvasState}
       />
       <div>
         <NextReactP5Wrapper
@@ -437,6 +442,8 @@ const Sketch = () => {
           hit={canvasState.hit}
           dragWhole={canvasState.dragWhole}
           lastMouse={canvasState.lastMouse}
+          circles={circleState.circles}
+          layers={canvasState.layers}
         />
       </div>
     </div>

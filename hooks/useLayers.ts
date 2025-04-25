@@ -2,6 +2,22 @@ import {useCallback} from "react";
 import {CubicPath} from "@/lib/geometry";
 import type {Layer} from "@/types/types";
 
+const generateUniqueLayerName = (
+  existingLayers: Layer[],
+  baseName: string = "Layer"
+): string => {
+  const existingNames = new Set(existingLayers.map((layer) => layer.name));
+  let name = baseName;
+  let counter = 1;
+
+  while (existingNames.has(name)) {
+    name = `${baseName} ${counter}`;
+    counter++;
+  }
+
+  return name;
+};
+
 export const useLayers = (
   layers: Layer[],
   currentLayerIndex: number,
@@ -12,7 +28,7 @@ export const useLayers = (
     const newLayer: Layer = {
       path: newPath,
       isVisible: true,
-      name: `Layer ${layers.length}`,
+      name: generateUniqueLayerName(layers),
     };
     onUpdate([...layers, newLayer], layers.length);
   }, [layers, onUpdate]);
@@ -21,7 +37,16 @@ export const useLayers = (
     (index: number) => {
       if (layers.length <= 1) return; // 最後のレイヤーは削除できない
       const newLayers = layers.filter((_, i) => i !== index);
-      const newIndex = Math.min(currentLayerIndex, newLayers.length - 1);
+      // 削除後の新しいインデックスを計算
+      let newIndex = currentLayerIndex;
+      if (index < currentLayerIndex) {
+        // 削除するレイヤーが現在のレイヤーより前にある場合
+        newIndex = currentLayerIndex - 1;
+      } else if (index === currentLayerIndex) {
+        // 削除するレイヤーが現在のレイヤーの場合
+        newIndex = Math.min(currentLayerIndex, newLayers.length - 1);
+      }
+      // 現在のレイヤーより後ろのレイヤーを削除する場合はインデックスは変わらない
       onUpdate(newLayers, newIndex);
     },
     [layers, currentLayerIndex, onUpdate]
@@ -39,6 +64,15 @@ export const useLayers = (
 
   const renameLayer = useCallback(
     (index: number, newName: string) => {
+      // 新しい名前が既存の名前と重複していないかチェック
+      const isNameUnique = !layers.some(
+        (layer, i) => i !== index && layer.name === newName
+      );
+      if (!isNameUnique) {
+        console.warn(`Layer name "${newName}" is already in use`);
+        return;
+      }
+
       const newLayers = layers.map((layer, i) =>
         i === index ? {...layer, name: newName} : layer
       );

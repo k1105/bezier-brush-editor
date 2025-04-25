@@ -16,7 +16,8 @@ export function drawPath(
   isSketchPlaying: boolean,
   currentCircleIndex: number,
   circles: Circle[],
-  animationStrategy: AnimationStrategy
+  animationStrategy: AnimationStrategy,
+  isActivePath: boolean
 ) {
   const A = path.anchors;
   if (A.length === 0) return;
@@ -57,7 +58,7 @@ export function drawPath(
   );
 
   p.stroke(0, 255, 0);
-  p.strokeWeight(1);
+  p.strokeWeight(isActivePath ? 3 : 1);
   p.noFill();
   p.beginShape();
   for (let i = 0; i < A.length - 1; i++) {

@@ -1,8 +1,9 @@
 import styles from "./Controls.module.scss";
 import {useState} from "react";
 import LayerControl from "./LayerControl";
-import {Mode, AnimationType, Layer} from "@/types/types";
+import {Mode, AnimationType, Layer, CanvasState} from "@/types/types";
 import {Icon} from "@iconify/react/dist/iconify.js";
+import {useLayers} from "@/hooks/useLayers";
 
 interface ControlsProps {
   mode: Mode;
@@ -16,6 +17,7 @@ interface ControlsProps {
   layers: Layer[];
   currentLayerIndex: number;
   setCurrentLayerIndex: (index: number) => void;
+  updateCanvasState: (updates: Partial<CanvasState>) => void;
 }
 
 const Controls = ({
@@ -30,8 +32,20 @@ const Controls = ({
   layers,
   currentLayerIndex,
   setCurrentLayerIndex,
+  updateCanvasState,
 }: ControlsProps) => {
   const [expandedLayers, setExpandedLayers] = useState<Set<number>>(new Set());
+
+  const {removeLayer, renameLayer} = useLayers(
+    layers,
+    currentLayerIndex,
+    (updatedLayers, newIndex) => {
+      updateCanvasState({
+        layers: updatedLayers,
+        currentLayerIndex: newIndex,
+      });
+    }
+  );
 
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -150,8 +164,29 @@ const Controls = ({
         onClick={stopPropagation}
         onMouseDown={stopPropagation}
       >
+        <div className={styles.layerActions}>
+          <button
+            className={styles.layerActionButton}
+            onClick={() => {
+              console.log("delete layer");
+              removeLayer(currentLayerIndex);
+            }}
+            disabled={layers.length <= 1}
+          >
+            <Icon icon="ic:baseline-delete" className={styles.icon} />
+          </button>
+          <button
+            className={styles.layerActionButton}
+            onClick={() => console.log("copy layer")}
+          >
+            <Icon
+              icon="ic:baseline-control-point-duplicate"
+              className={styles.icon}
+            />
+          </button>
+        </div>
         <div onClick={stopPropagation} onMouseDown={stopPropagation}>
-          {layers.map((_, index) => {
+          {layers.map((layer, index) => {
             const isExpanded = expandedLayers.has(index);
             return (
               <LayerControl
@@ -162,6 +197,8 @@ const Controls = ({
                 setExpandedLayers={setExpandedLayers}
                 isSelected={index === currentLayerIndex}
                 onSelect={() => setCurrentLayerIndex(index)}
+                layerName={layer.name}
+                onRename={(newName) => renameLayer(index, newName)}
               />
             );
           })}

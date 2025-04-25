@@ -1,5 +1,6 @@
 .layer {
   padding: 1rem;
+  position: relative;
   &:hover {
     background-color: #777;
   }
@@ -14,14 +15,30 @@
 
   .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 8px;
+    cursor: pointer;
 
     p {
       margin: 0;
-      flex-grow: 1;
-      cursor: pointer;
+      flex: 1;
+      user-select: none;
+    }
+
+    .nameInput {
+      flex: 1;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: inherit;
+      font-family: inherit;
+      background: white;
+      color: inherit;
+      outline: none;
+
+      &:focus {
+        border-color: #007bff;
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import styles from "./LayerControl.module.scss";
-import {Icon} from "@iconify/react/dist/iconify.js";
+import {useState} from "react";
 
 interface LayerControlProps {
   keyIndex: number;
@@ -8,6 +8,8 @@ interface LayerControlProps {
   setExpandedLayers: (expandedLayers: Set<number>) => void;
   isSelected: boolean;
   onSelect: () => void;
+  layerName: string;
+  onRename: (newName: string) => void;
 }
 
 const LayerControl = ({
@@ -17,7 +19,12 @@ const LayerControl = ({
   setExpandedLayers,
   isSelected,
   onSelect,
+  layerName,
+  onRename,
 }: LayerControlProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(layerName);
+
   const toggleLayer = (index: number) => {
     const newExpandedLayers = new Set<number>(expandedLayers);
     if (newExpandedLayers.has(index)) {
@@ -32,6 +39,28 @@ const LayerControl = ({
     e.stopPropagation();
   };
 
+  const handleNameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditName(e.target.value);
+  };
+
+  const handleNameBlur = () => {
+    if (editName !== layerName) {
+      onRename(editName);
+    }
+    setIsEditing(false);
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleNameBlur();
+    }
+  };
+
   return (
     <div
       key={`layer-${keyIndex}`}
@@ -44,14 +73,20 @@ const LayerControl = ({
       onMouseDown={stopPropagation}
     >
       <div className={styles.header}>
-        <p>Layer {keyIndex}</p>
-        <div className={styles.iconContainer}>
-          <Icon
-            icon="ic:baseline-control-point-duplicate"
-            className={styles.icon}
+        {isEditing ? (
+          <input
+            type="text"
+            value={editName}
+            onChange={handleNameChange}
+            onBlur={handleNameBlur}
+            onKeyDown={handleNameKeyDown}
+            onClick={stopPropagation}
+            className={styles.nameInput}
+            autoFocus
           />
-          <Icon icon="ic:baseline-delete" className={styles.icon} />
-        </div>
+        ) : (
+          <p onClick={handleNameClick}>{layerName}</p>
+        )}
       </div>
       <div className={`${styles.content} ${isExpanded ? styles.expanded : ""}`}>
         <div className={styles.inputContainer}>
