@@ -216,6 +216,7 @@ const Controls = ({
                 onSelect={() => setCurrentLayerIndex(index)}
                 layerName={layer.name}
                 onRename={(newName) => renameLayer(index, newName)}
+                vertexCount={layer.path.anchors.length}
               />
             );
           })}

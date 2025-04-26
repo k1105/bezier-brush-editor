@@ -9,6 +9,7 @@ interface LayerControlProps {
   onSelect: () => void;
   layerName: string;
   onRename: (newName: string) => void;
+  vertexCount: number;
 }
 
 const LayerControl = ({
@@ -19,6 +20,7 @@ const LayerControl = ({
   onSelect,
   layerName,
   onRename,
+  vertexCount,
 }: LayerControlProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(layerName);
@@ -79,6 +81,9 @@ const LayerControl = ({
         ) : (
           <p onClick={handleNameClick}>{layerName}</p>
         )}
+        <div>
+          <p>{vertexCount}</p>
+        </div>
       </div>
       <div className={`${styles.content} ${isExpanded ? styles.expanded : ""}`}>
         <div className={styles.inputContainer}>

@@ -16,29 +16,21 @@
   .header {
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 4px;
+    gap: 1rem;
     cursor: pointer;
-
     p {
       margin: 0;
-      flex: 1;
       user-select: none;
     }
 
     .nameInput {
-      flex: 1;
-      padding: 4px;
       border: 1px solid #ccc;
-      border-radius: 4px;
       font-size: inherit;
       font-family: inherit;
       background: white;
-      color: inherit;
+      color: black;
       outline: none;
-
-      &:focus {
-        border-color: #007bff;
-      }
     }
   }
 }
